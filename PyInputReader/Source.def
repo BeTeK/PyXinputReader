@@ -1,0 +1,6 @@
+LIBRARY XINPUTREADER
+EXPORTS
+	version @1
+	start @2
+	stop @3
+	poll @4
