@@ -35,6 +35,7 @@ private:
 
 	int mSliderCount;
 	int mPOVCount;
+	int mKeyCount;
 	bool mXAxis;
 	bool mYAxis;
 	bool mZAxis;

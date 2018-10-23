@@ -154,6 +154,7 @@ const JoyState Joystick::poll()
 			mCurState.buttons[i] = 0;
 		}
 	}
+	mCurState.buttonCount = mKeyCount;
 
 	return mCurState;
 }
@@ -225,6 +226,10 @@ BOOL Joystick::EnumObjectsCallback(const DIDEVICEOBJECTINSTANCE * pdidoi, VOID *
 	if (pdidoi->guidType == GUID_POV)
 	{
 		joy.mPOVCount += 1;
+	}
+	if (pdidoi->guidType == GUID_Button)
+	{
+		joy.mKeyCount += 1;
 	}
 
 	return DIENUM_CONTINUE;
