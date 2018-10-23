@@ -7,7 +7,7 @@
 std::wstring FormatMsg(DWORD errNo);
 const wchar_t* WindowsHandler::mClassName = L"xinputHandler";
 
-WindowsHandler::WindowsHandler(HINSTANCE pInst) : mHwnd(NULL), mAtom(0), mStopRequested(false)
+WindowsHandler::WindowsHandler(HINSTANCE pInst) : mHwnd(NULL), mAtom(0), mStopRequested(false), mTimer(0)
 {
 	WNDCLASSEX wc;
 
@@ -52,10 +52,10 @@ WindowsHandler::WindowsHandler(HINSTANCE pInst) : mHwnd(NULL), mAtom(0), mStopRe
 
 	if (mHwnd == 0)
 	{
-		auto msg = FormatMsg(GetLastError());
+		return;
 	}
 
-	SetTimer(mHwnd, 0, 1000 / 200, nullptr);
+	mTimer = SetTimer(mHwnd, 0, 1000 / 200, nullptr);
 
 }
 
@@ -84,6 +84,11 @@ std::wstring FormatMsg(DWORD errNo)
 
 WindowsHandler::~WindowsHandler()
 {
+	if (mHwnd != 0 && mTimer != 0)
+	{
+		KillTimer(mHwnd, mTimer);
+	}
+
 	if (mHwnd != 0)
 	{
 		DestroyWindow(mHwnd);
@@ -145,7 +150,22 @@ void WindowsHandler::waitMessages()
 	WaitMessage();
 }
 
-void WindowsHandler::requestStop()
+void WindowsHandler::setTimerFreq(unsigned int pFreq)
 {
-	mStopRequested = true;
+	if (mHwnd != 0 && mTimer != 0)
+	{
+		KillTimer(mHwnd, mTimer);
+	}
+
+	auto freq = pFreq;
+	if (freq > 1000)
+	{
+		freq = 1000;
+	}
+	if (freq == 0)
+	{
+		freq = 1;
+	}
+
+	mTimer = SetTimer(mHwnd, 0, 1000 / pFreq, nullptr);
 }

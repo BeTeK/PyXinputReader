@@ -20,6 +20,7 @@ public:
 	bool isInitialized() const;
 	const std::vector<JoyState> getStates() const;
 	void rescan();
+	void setFreq(unsigned int pFreq);
 private:
 	static void threadFn(XReaderThread* that);
 
@@ -30,6 +31,7 @@ private:
 	bool mStopRequested;
 	JoyPoller* mJoyPoller;
 	std::vector<JoyState> mStates;
+	int mFreq;
 
 	bool mRequestRescan;
 };

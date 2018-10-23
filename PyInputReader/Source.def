@@ -5,3 +5,5 @@ EXPORTS
 	stop @3
 	poll @4
 	rescan @5
+	setFreq @6
+
