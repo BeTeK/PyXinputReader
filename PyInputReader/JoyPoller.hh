@@ -20,9 +20,9 @@ public:
 	const std::vector<JoyState>& poll();
 	const std::vector<JoyState>& getStates();
 
+	void rescan();
 private:
 	WindowsHandler& mWinHandler;
-	void initialize(WindowsHandler & pWinHanler);
 	static BOOL CALLBACK EnumJoysticksCallback(const DIDEVICEINSTANCE* pdidInstance, VOID* pContext);
 
 	std::vector<Joystick::JoystickPtr> mJoyLst;

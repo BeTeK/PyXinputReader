@@ -50,6 +50,8 @@ class XInputReader(object):
 
         self._pollFn = self.dll[4]
         self._pollFn.restype = ctypes.POINTER(JoyStatesStruct)
+		
+        self._rescanFn = self.dll[5]
 
         # self.pollFn.restype = ctypes.c_void_p
 
@@ -69,7 +71,10 @@ class XInputReader(object):
 
     def stop(self):
         self._stopFn()
-
+		
+    def rescan(self):
+        self._rescanFn()
+		
     def __enter__(self):
         self.start()
         return self

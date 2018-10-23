@@ -7,7 +7,8 @@ XReaderThread::XReaderThread(HINSTANCE pInst) :
 	mInst(pInst),
 	mStopRequested(false),
 	mJoyPoller(0),
-	mStates()
+	mStates(),
+	mRequestRescan(false)
 {
 	mWinThread = std::thread(threadFn, this);
 }
@@ -40,6 +41,13 @@ const std::vector<JoyState> XReaderThread::getStates() const
 	return ret;
 }
 
+void XReaderThread::rescan()
+{
+	mLock.lock();
+	mRequestRescan = true;
+	mLock.unlock();
+}
+
 void XReaderThread::threadFn(XReaderThread* that)
 {
 	that->mWinHandler = new WindowsHandler(that->mInst);
@@ -52,6 +60,12 @@ void XReaderThread::threadFn(XReaderThread* that)
 		{
 			that->mLock.unlock();
 			return;
+		}
+
+		if (that->mRequestRescan)
+		{
+			that->mRequestRescan = false;
+			that->mJoyPoller->rescan();
 		}
 
 		bool needsToPoll = that->mWinHandler->processMessages();

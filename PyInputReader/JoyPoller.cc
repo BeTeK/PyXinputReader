@@ -49,7 +49,7 @@ JoyPoller::~JoyPoller()
 JoyPoller::JoyPoller(WindowsHandler & pWinHanler) : mWinHandler(pWinHanler), mDI(0), mJoyLst(), mJoyStates()
 {
 	InitCommonControls();
-	initialize(pWinHanler);
+	rescan();
 }
 
 const std::vector<JoyState>& JoyPoller::poll()
@@ -70,8 +70,10 @@ const std::vector<JoyState>& JoyPoller::getStates()
 	return mJoyStates;
 }
 
-void JoyPoller::initialize(WindowsHandler & pWinHanler)
+void JoyPoller::rescan()
 {
+	mJoyLst.clear();
+
 	HRESULT hr;
 	if(FAILED(DirectInput8Create(GetModuleHandle(nullptr), DIRECTINPUT_VERSION, IID_IDirectInput8, (VOID**)&mDI, nullptr)))
 	{
@@ -95,7 +97,7 @@ void JoyPoller::initialize(WindowsHandler & pWinHanler)
 
 	for (auto inst : instances)
 	{
-		mJoyLst.push_back(Joystick::JoystickPtr(new Joystick(inst, mDI, pWinHanler.getHwnd())));
+		mJoyLst.push_back(Joystick::JoystickPtr(new Joystick(inst, mDI, mWinHandler.getHwnd())));
 	}
 
 	mJoyStates.resize(mJoyLst.size());

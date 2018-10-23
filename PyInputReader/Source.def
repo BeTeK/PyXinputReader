@@ -4,3 +4,4 @@ EXPORTS
 	start @2
 	stop @3
 	poll @4
+	rescan @5
