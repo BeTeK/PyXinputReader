@@ -35,6 +35,7 @@ Joystick::Joystick(DIDEVICEINSTANCE pInstance, LPDIRECTINPUT8 pDInput, HWND hwnd
 	mRXAxis(false),
 	mRYAxis(false),
 	mRZAxis(false),
+        mKeyCount(0),
 	mCurState()
 {
 	HRESULT hr = pDInput->CreateDevice(pInstance.guidInstance, &mDev, nullptr);
