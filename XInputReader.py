@@ -39,9 +39,11 @@ class JoyState:
 class XInputReader(object):
 
     def __init__(self, path = None):
-        print(path)
-        self.dll = ctypes.WinDLL(path)
+        self.dll = self._tryToLoadDll(path)
 
+        if self.dll is None:
+            raise Exception("Could not find xinputreader.dll, xinputreader_32.dll or xinputreader_64.dll")
+        
         self._versionFn = self.dll[1]
         self._versionFn.restype = ctypes.c_char_p
 
@@ -55,8 +57,23 @@ class XInputReader(object):
         self._rescanFn = self.dll[5]
         self._setFreq = self.dll[6]
 
-        # self.pollFn.restype = ctypes.c_void_p
+    def _tryToLoadDll(self, path):
+        if path is None:
+            try:
+                return ctypes.WinDLL("xinputReader_32.dll")
+            except OSError as e:
+                pass
 
+            try:
+                return ctypes.WinDLL("xinputReader_64.dll")
+            except OSError as e:
+                pass
+            
+        else:
+            return ctypes.WinDLL(path)
+
+        return None
+        
     def version(self):
         return self._versionFn().decode("LATIN-1")
 
