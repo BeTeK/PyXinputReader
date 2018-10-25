@@ -123,10 +123,6 @@ const JoyState Joystick::poll()
 	int currentAxisIndex = 0;
 
 	mCurState.connected = 1;
-	if (mXAxis)
-	{
-		mCurState.axis[currentAxisIndex++] = js.lX;
-	}
 
 	SetAxis(mXAxis, mCurState.axis, currentAxisIndex, js.lX);
 	SetAxis(mYAxis, mCurState.axis, currentAxisIndex, js.lY);
