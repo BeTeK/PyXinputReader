@@ -60,6 +60,8 @@ class XInputReader(object):
         self._rescanFn = self.dll[5]
         self._setFreq = self.dll[6]
 
+        self.inputReaderHandle = self._startFn()
+
     def _tryToLoadDll(self, path):
         if path is None:
             try:
@@ -94,9 +96,6 @@ class XInputReader(object):
 
         return ret
 
-    def start(self):
-        self.inputReaderHandle = self._startFn()
-
     def stop(self):
         self._throwIfNotStarted()
         self._stopFn(ctypes.c_void_p(self.inputReaderHandle))
@@ -111,7 +110,6 @@ class XInputReader(object):
         self._setFreq(ctypes.c_void_p(self.inputReaderHandle), ctypes.c_int(freq))
 
     def __enter__(self):
-        self.start()
         return self
 
     def __exit__(self, exc_type, exc_value, traceback):
