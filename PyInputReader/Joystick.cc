@@ -142,16 +142,15 @@ const JoyState Joystick::poll()
 	}
 
 	mCurState.axisCount = currentAxisIndex;
-
 	for (auto i = 0; i < 128; ++i)
 	{
 		if (js.rgbButtons[i] && 0x80)
 		{
-			mCurState.buttons[i] = 1;
+			mCurState.buttons[i / 8] |= 1 << (i % 8);
 		}
 		else
 		{
-			mCurState.buttons[i] = 0;
+			mCurState.buttons[i / 8] &= ~(1 << (i % 8));
 		}
 	}
 	mCurState.buttonCount = mKeyCount;

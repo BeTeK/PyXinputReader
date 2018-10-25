@@ -9,7 +9,7 @@ struct JoyState
 	int axisCount;
 	long axis[12];
 	int buttonCount;
-	char buttons[128];
+	char buttons[128 / 8];
 	WCHAR name[MAX_PATH];
 	unsigned char guid[16];
 };

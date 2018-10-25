@@ -6,7 +6,7 @@ class JoyStateStruct(ctypes.Structure):
                 ("axisCount", ctypes.c_int),
                 ("axis", ctypes.c_long * 12),
                 ("buttonCount", ctypes.c_int),
-                ("buttons", ctypes.c_uint8 * 128),
+                ("buttons", ctypes.c_uint8 * int(128 / 8)),
                 ("name", ctypes.c_wchar * 260),
                 ("guid", ctypes.c_char * 16)]
 
@@ -27,7 +27,7 @@ class JoyState:
 
         self.buttons = [False] * jsStr.buttonCount
         for i in range(jsStr.buttonCount):
-            self.buttons[i] = jsStr.buttons[i] != 0
+            self.buttons[i] = jsStr.buttons[i // 8] & (1 << (i % 8)) != 0
 
     def __str__(self):
         return "JoyState(name = {0})".format(self.name)
