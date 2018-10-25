@@ -4,3 +4,4 @@
 **/Release
 **/*vcxproj.user
 __pycache__/*
+/.idea/workspace.xml
