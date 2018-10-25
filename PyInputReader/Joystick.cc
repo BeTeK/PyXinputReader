@@ -138,7 +138,7 @@ const JoyState Joystick::poll()
 
 	for (auto i = 0; i < mPOVCount; ++i)
 	{
-		mCurState.axis[currentAxisIndex++] = js.rglSlider[i];
+		mCurState.axis[currentAxisIndex++] = js.rgdwPOV[i];
 	}
 
 	mCurState.axisCount = currentAxisIndex;
