@@ -3,14 +3,15 @@
 XReaderThread::XReaderThread(HINSTANCE pInst) : 
 	mWinThread(), 
 	mLock(), 
-	mWinHandler(0),
 	mInst(pInst),
 	mStopRequested(false),
-	mJoyPoller(0),
 	mStates(),
 	mRequestRescan(false),
-	mFreq(-1)
+	mFreq(-1),
+	mJoyStates(),
+	mCallerSafeStates()
 {
+	mJoyStates.joyStates = 0;
 	mWinThread = std::thread(threadFn, this);
 }
 
@@ -21,25 +22,32 @@ XReaderThread::~XReaderThread()
 	mLock.unlock();
 
 	mWinThread.join();
-	delete mWinHandler;
-	delete mJoyPoller;
 }
 
 bool XReaderThread::isInitialized() const
 {
-	mLock.lock();
-	bool initialized = mWinHandler->isInitialized();
-	mLock.unlock();
-	return initialized;
+	return true;
 }
 
-const std::vector<JoyState> XReaderThread::getStates() const
+const JoyStates* XReaderThread::getStates() const
 {
 	mLock.lock();
-	std::vector<JoyState> ret(mStates);
+	mCallerSafeStates.resize(mStates.size());
+	mCallerSafeStates.assign(mStates.begin(), mStates.end());
 	mLock.unlock();
 
-	return ret;
+	if (mCallerSafeStates.size() > 0)
+	{
+		mJoyStates.joyStates = &mCallerSafeStates.at(0);
+	}
+	else
+	{
+		mJoyStates.joyStates = 0;
+	}
+
+	mJoyStates.stateCount = static_cast<int>(mCallerSafeStates.size());
+
+	return &mJoyStates;
 }
 
 void XReaderThread::rescan()
@@ -61,8 +69,8 @@ void XReaderThread::setFreq(unsigned int pFreq)
 
 void XReaderThread::threadFn(XReaderThread* that)
 {
-	that->mWinHandler = new WindowsHandler(that->mInst);
-	that->mJoyPoller = new JoyPoller(*that->mWinHandler);
+	WindowsHandler mWinHandler(that->mInst);
+	JoyPoller mJoyPoller(mWinHandler);
 
 	while (true)
 	{
@@ -76,22 +84,22 @@ void XReaderThread::threadFn(XReaderThread* that)
 		if (that->mRequestRescan)
 		{
 			that->mRequestRescan = false;
-			that->mJoyPoller->rescan();
+			mJoyPoller.rescan();
 		}
 		
 		if (that->mFreq >= 0)
 		{
-			that->mWinHandler->setTimerFreq(that->mFreq);
+			mWinHandler.setTimerFreq(that->mFreq);
 			that->mFreq = -1;
 		}
 
-		bool needsToPoll = that->mWinHandler->processMessages();
+		bool needsToPoll = mWinHandler.processMessages();
 		if (needsToPoll)
 		{
-			that->mStates = that->mJoyPoller->poll();
+			that->mStates = mJoyPoller.poll();
 		}
 		that->mLock.unlock();
 
-		that->mWinHandler->waitMessages();
+		mWinHandler.waitMessages();
 	}
 }

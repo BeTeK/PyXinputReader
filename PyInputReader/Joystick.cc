@@ -64,18 +64,21 @@ Joystick::Joystick(DIDEVICEINSTANCE pInstance, LPDIRECTINPUT8 pDInput, HWND hwnd
 	mCurState.guid[1] = reinterpret_cast<unsigned char*>(&mInst.guidInstance.Data1)[1];
 	mCurState.guid[2] = reinterpret_cast<unsigned char*>(&mInst.guidInstance.Data1)[2];
 	mCurState.guid[3] = reinterpret_cast<unsigned char*>(&mInst.guidInstance.Data1)[3];
+
 	mCurState.guid[4] = reinterpret_cast<unsigned char*>(&mInst.guidInstance.Data2)[0];
 	mCurState.guid[5] = reinterpret_cast<unsigned char*>(&mInst.guidInstance.Data2)[1];
+
 	mCurState.guid[6] = reinterpret_cast<unsigned char*>(&mInst.guidInstance.Data3)[0];
 	mCurState.guid[7] = reinterpret_cast<unsigned char*>(&mInst.guidInstance.Data3)[1];
-	mCurState.guid[9] = mInst.guidInstance.Data4[0];
-	mCurState.guid[10] = mInst.guidInstance.Data4[1];
-	mCurState.guid[11] = mInst.guidInstance.Data4[2];
-	mCurState.guid[12] = mInst.guidInstance.Data4[3];
-	mCurState.guid[13] = mInst.guidInstance.Data4[4];
-	mCurState.guid[14] = mInst.guidInstance.Data4[5];
-	mCurState.guid[15] = mInst.guidInstance.Data4[6];
-	mCurState.guid[16] = mInst.guidInstance.Data4[7];
+
+	mCurState.guid[8] =  mInst.guidInstance.Data4[0];
+	mCurState.guid[9] =  mInst.guidInstance.Data4[1];
+	mCurState.guid[10] = mInst.guidInstance.Data4[2];
+	mCurState.guid[11] = mInst.guidInstance.Data4[3];
+	mCurState.guid[12] = mInst.guidInstance.Data4[4];
+	mCurState.guid[13] = mInst.guidInstance.Data4[5];
+	mCurState.guid[14] = mInst.guidInstance.Data4[6];
+	mCurState.guid[15] = mInst.guidInstance.Data4[7];
 
 	mInitialized = true;
 }

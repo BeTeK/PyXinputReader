@@ -18,7 +18,7 @@ public:
 	XReaderThread& operator = (const XReaderThread& pOne) = delete;
 
 	bool isInitialized() const;
-	const std::vector<JoyState> getStates() const;
+	const JoyStates* getStates() const;
 	void rescan();
 	void setFreq(unsigned int pFreq);
 private:
@@ -26,13 +26,12 @@ private:
 
 	std::thread mWinThread;
 	mutable std::mutex mLock;
-	WindowsHandler* mWinHandler;
 	HINSTANCE mInst;
 	bool mStopRequested;
-	JoyPoller* mJoyPoller;
 	std::vector<JoyState> mStates;
 	int mFreq;
-
+	mutable JoyStates mJoyStates;
+	mutable std::vector<JoyState> mCallerSafeStates;
 	bool mRequestRescan;
 };
 

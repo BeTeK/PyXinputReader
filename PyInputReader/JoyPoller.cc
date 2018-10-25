@@ -40,6 +40,8 @@ DEFINE_GUID(IID_IDirectInputJoyConfig8, 0xeb0d7dfa, 0x1990, 0x4f27, 0xb4, 0xd6, 
 
 JoyPoller::~JoyPoller()
 {
+	mJoyLst.resize(0);
+
 	if (mDI != 0)
 	{
 		mDI->Release();

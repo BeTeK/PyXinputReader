@@ -17,7 +17,7 @@ class JoyStatesStruct(ctypes.Structure):
 
 class JoyState:
     def __init__(self, jsStr):
-        self.name = jsStr.name
+        self.name = str(jsStr.name)
         self.guid = jsStr.guid
         self.connected = ord(jsStr.connected) != 0
         self.axises = [0] * jsStr.axisCount
@@ -43,17 +43,20 @@ class XInputReader(object):
 
         if self.dll is None:
             raise Exception("Could not find xinputreader.dll, xinputreader_32.dll or xinputreader_64.dll")
-        
+
+        self.inputReaderHandle = None
+
         self._versionFn = self.dll[1]
         self._versionFn.restype = ctypes.c_char_p
 
         self._startFn = self.dll[2]
+        self._startFn.restype = ctypes.c_void_p
 
         self._stopFn = self.dll[3]
 
         self._pollFn = self.dll[4]
         self._pollFn.restype = ctypes.POINTER(JoyStatesStruct)
-		
+
         self._rescanFn = self.dll[5]
         self._setFreq = self.dll[6]
 
@@ -77,8 +80,14 @@ class XInputReader(object):
     def version(self):
         return self._versionFn().decode("LATIN-1")
 
+    def _throwIfNotStarted(self):
+        if self.inputReaderHandle is None:
+            raise Exception("XInputReader is not started yet. Call start() or use with .. as ..")
+
     def poll(self):
-        callVals =  self._pollFn()
+        self._throwIfNotStarted()
+
+        callVals =  self._pollFn(ctypes.c_void_p(self.inputReaderHandle))
         ret = []
         for i in range(callVals.contents.stateCount):
             ret.append(JoyState(callVals.contents.joyStates[i]))
@@ -86,17 +95,21 @@ class XInputReader(object):
         return ret
 
     def start(self):
-        self._startFn()
+        self.inputReaderHandle = self._startFn()
 
     def stop(self):
-        self._stopFn()
-		
+        self._throwIfNotStarted()
+        self._stopFn(ctypes.c_void_p(self.inputReaderHandle))
+        self.inputReaderHandle = None
+
     def rescan(self):
-        self._rescanFn()
+        self._throwIfNotStarted()
+        self._rescanFn(ctypes.c_void_p(self.inputReaderHandle))
 
     def setFreq(self, freq):
-        self._setFreq(ctypes.c_int(freq))
-		
+        self._throwIfNotStarted()
+        self._setFreq(ctypes.c_void_p(self.inputReaderHandle), ctypes.c_int(freq))
+
     def __enter__(self):
         self.start()
         return self
