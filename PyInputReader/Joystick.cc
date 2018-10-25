@@ -178,22 +178,22 @@ BOOL Joystick::EnumObjectsCallback(const DIDEVICEOBJECTINSTANCE * pdidoi, VOID *
 {
 	auto& joy = *reinterpret_cast<Joystick*>(pContext);
 
-	if (pdidoi->dwType & DIDFT_AXIS)
-	{
-		DIPROPRANGE diprg;
-		diprg.diph.dwSize = sizeof(DIPROPRANGE);
-		diprg.diph.dwHeaderSize = sizeof(DIPROPHEADER);
-		diprg.diph.dwHow = DIPH_BYID;
-		diprg.diph.dwObj = pdidoi->dwType; // Specify the enumerated axis
-		diprg.lMin = -1000;
-		diprg.lMax = +1000;
+	//if (pdidoi->dwType & DIDFT_AXIS)
+	//{
+	//	DIPROPRANGE diprg;
+	//	diprg.diph.dwSize = sizeof(DIPROPRANGE);
+	//	diprg.diph.dwHeaderSize = sizeof(DIPROPHEADER);
+	//	diprg.diph.dwHow = DIPH_BYID;
+	//	diprg.diph.dwObj = pdidoi->dwType; // Specify the enumerated axis
+	//	diprg.lMin = -1000;
+	//	diprg.lMax = +1000;
 
-		// Set the range for the axis
-		if (FAILED(joy.mDev->SetProperty(DIPROP_RANGE, &diprg.diph)))
-		{
-			return DIENUM_STOP;
-		}
-	}
+	//	// Set the range for the axis
+	//	if (FAILED(joy.mDev->SetProperty(DIPROP_RANGE, &diprg.diph)))
+	//	{
+	//		return DIENUM_STOP;
+	//	}
+	//}
 
 	if (pdidoi->guidType == GUID_XAxis)
 	{
