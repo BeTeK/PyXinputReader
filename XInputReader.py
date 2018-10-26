@@ -1,5 +1,5 @@
 import ctypes
-
+import os.path
 
 class JoyStateStruct(ctypes.Structure):
     _fields_ = [("connected", ctypes.c_char),
@@ -53,19 +53,23 @@ class XInputReader(object):
         self._startFn.restype = ctypes.c_void_p
 
         self._stopFn = self.dll[3]
+        self._stopFn.restype = None
 
         self._pollFn = self.dll[4]
         self._pollFn.restype = ctypes.POINTER(JoyStatesStruct)
 
         self._rescanFn = self.dll[5]
+        self._rescanFn.restype = None
+
         self._setFreq = self.dll[6]
+        self._setFreq.restype = None
 
         self.inputReaderHandle = self._startFn()
 
     def _tryToLoadDll(self, path):
         if path is None:
             try:
-                return ctypes.WinDLL("xinputReader_32.dll")
+                return ctypes.CDLL("xinputReader_32.dll")
             except OSError as e:
                 pass
 
@@ -73,7 +77,22 @@ class XInputReader(object):
                 return ctypes.WinDLL("xinputReader_64.dll")
             except OSError as e:
                 pass
-            
+
+            try:
+                return ctypes.CDLL(os.path.join(os.path.dirname(__file__), "xinputReader_32.dll"))
+            except OSError as e:
+                pass
+
+            try:
+                return ctypes.WinDLL(os.path.join(os.path.dirname(__file__), "xinputReader_64.dll"))
+            except OSError as e:
+                pass
+
+            try:
+                return ctypes.WinDLL("xinputReader_64.dll")
+            except OSError as e:
+                pass
+
         else:
             return ctypes.WinDLL(path)
 
