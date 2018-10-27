@@ -88,13 +88,16 @@ class XInputReader(object):
             except OSError as e:
                 pass
 
+        else:
             try:
-                return ctypes.WinDLL("xinputReader_64.dll")
+                return ctypes.CDLL(path)
             except OSError as e:
                 pass
 
-        else:
-            return ctypes.WinDLL(path)
+            try:
+                return ctypes.WinDLL(path)
+            except OSError as e:
+                raise e
 
         return None
         
