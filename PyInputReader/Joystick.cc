@@ -102,6 +102,7 @@ const JoyState Joystick::poll()
 {
 	HRESULT hr;
 	DIJOYSTATE2 js;
+	mCurState.connected = 0;
 
 	hr = mDev->Poll();
 	if(FAILED(hr))
