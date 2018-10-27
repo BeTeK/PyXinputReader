@@ -33,6 +33,8 @@ private:
 	mutable JoyStates mJoyStates;
 	mutable std::vector<JoyState> mCallerSafeStates;
 	bool mRequestRescan;
+	JoyPoller* mJoyPoller;
+	WindowsHandler* mWinHandler;
 };
 
 #endif // !X_READER_THREAD_HH

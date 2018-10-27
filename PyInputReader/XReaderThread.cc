@@ -9,7 +9,9 @@ XReaderThread::XReaderThread(HINSTANCE pInst) :
 	mRequestRescan(false),
 	mFreq(-1),
 	mJoyStates(),
-	mCallerSafeStates()
+	mCallerSafeStates(),
+	mJoyPoller(0),
+	mWinHandler(0)
 {
 	mJoyStates.joyStates = 0;
 	mWinThread = std::thread(threadFn, this);
@@ -22,6 +24,16 @@ XReaderThread::~XReaderThread()
 	mLock.unlock();
 
 	mWinThread.join();
+
+	if (mJoyPoller)
+	{
+		delete mJoyPoller;
+	}
+
+	if (mWinHandler != 0)
+	{
+		delete mWinHandler;
+	}
 }
 
 bool XReaderThread::isInitialized() const
@@ -32,8 +44,12 @@ bool XReaderThread::isInitialized() const
 const JoyStates* XReaderThread::getStates() const
 {
 	mLock.lock();
-	mCallerSafeStates.resize(mStates.size());
-	mCallerSafeStates.assign(mStates.begin(), mStates.end());
+	if (mJoyPoller != 0)
+	{
+		auto ret = mJoyPoller->poll();
+		mCallerSafeStates.resize(ret.size());
+		mCallerSafeStates.assign(ret.begin(), ret.end());
+	}
 	mLock.unlock();
 
 	if (mCallerSafeStates.size() > 0)
@@ -69,8 +85,8 @@ void XReaderThread::setFreq(unsigned int pFreq)
 
 void XReaderThread::threadFn(XReaderThread* that)
 {
-	WindowsHandler mWinHandler(that->mInst);
-	JoyPoller mJoyPoller(mWinHandler);
+	that->mWinHandler = new WindowsHandler(that->mInst);
+	that->mJoyPoller = new JoyPoller(*that->mWinHandler);
 
 	while (true)
 	{
@@ -84,22 +100,32 @@ void XReaderThread::threadFn(XReaderThread* that)
 		if (that->mRequestRescan)
 		{
 			that->mRequestRescan = false;
-			mJoyPoller.rescan();
+			that->mJoyPoller->rescan();
 		}
 		
 		if (that->mFreq >= 0)
 		{
-			mWinHandler.setTimerFreq(that->mFreq);
+			that->mWinHandler->setTimerFreq(that->mFreq);
 			that->mFreq = -1;
 		}
 
-		bool needsToPoll = mWinHandler.processMessages();
+		bool needsToPoll = that->mWinHandler->processMessages();
 		if (needsToPoll)
 		{
-			that->mStates = mJoyPoller.poll();
+			// that->mStates = mJoyPoller.poll();
 		}
 		that->mLock.unlock();
 
-		mWinHandler.waitMessages();
+		that->mWinHandler->waitMessages();
+	}
+
+	if (that->mJoyPoller)
+	{
+		delete that->mJoyPoller;
+	}
+
+	if (that->mWinHandler != 0)
+	{
+		delete that->mWinHandler;
 	}
 }
