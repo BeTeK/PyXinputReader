@@ -186,7 +186,7 @@ BOOL Joystick::EnumObjectsCallback(const DIDEVICEOBJECTINSTANCE * pdidoi, VOID *
 		diprg.diph.dwHow = DIPH_BYID;
 		diprg.diph.dwObj = pdidoi->dwType; // Specify the enumerated axis
 		diprg.lMin = 0;
-		diprg.lMax = 1<<16 - 1;
+		diprg.lMax = (1<<16) - 1;
 
 		// Set the range for the axis
 		if (FAILED(joy.mDev->SetProperty(DIPROP_RANGE, &diprg.diph)))
